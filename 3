@@ -1,0 +1,99 @@
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.Random;
+import java.util.Scanner;
+
+public class Вариант3 {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.print("Введите количество строк матрицы (N): ");
+        int N = scanner.nextInt();
+
+        System.out.print("Введите количество столбцов матрицы (M): ");
+        int M = scanner.nextInt();
+
+        int[][] matrix = new int[N][M];
+
+        System.out.println("Выберите способ заполнения матрицы:");
+        System.out.println("1. С клавиатуры");
+        System.out.println("2. Случайно (диапазон вводится с клавиатуры)");
+        System.out.println("3. Из файла");
+        int choice = scanner.nextInt();
+
+        switch (choice) {
+            case 1:
+                fillMatrixFromKeyboard(matrix, scanner);
+                break;
+            case 2:
+                fillMatrixRandomly(matrix, scanner);
+                break;
+            case 3:
+                System.out.print("Введите путь к файлу для матрицы: ");
+                String filePath = scanner.next();
+                fillMatrixFromFile(matrix, filePath);
+                break;
+            default:
+                System.out.println("Неверный выбор");
+                return;
+        }
+
+        double average = calculateAverage(matrix);
+        System.out.println("Среднее арифметическое всех чисел в матрице: " + average);
+    }
+
+    private static void fillMatrixFromKeyboard(int[][] matrix, Scanner scanner) {
+        System.out.println("Введите элементы матрицы:");
+        for (int i = 0; i < matrix.length; i++) {
+            for (int j = 0; j < matrix[i].length; j++) {
+                matrix[i][j] = scanner.nextInt();
+            }
+        }
+    }
+
+    private static void fillMatrixRandomly(int[][] matrix, Scanner scanner) {
+        System.out.print("Введите минимальное значение диапазона: ");
+        int min = scanner.nextInt();
+        System.out.print("Введите максимальное значение диапазона: ");
+        int max = scanner.nextInt();
+
+        Random random = new Random();
+        for (int i = 0; i < matrix.length; i++) {
+            for (int j = 0; j < matrix[i].length; j++) {
+                matrix[i][j] = random.nextInt((max - min) + 1) + min;
+            }
+        }
+    }
+
+    private static void fillMatrixFromFile(int[][] matrix, String fileName) {
+        try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
+            String line;
+            int rowIndex = 0;
+            while ((line = br.readLine()) != null && rowIndex < matrix.length) {
+                String[] numbers = line.split("\\s+");
+                for (int colIndex = 0; colIndex < numbers.length && colIndex < matrix[rowIndex].length; colIndex++) {
+                    matrix[rowIndex][colIndex] = Integer.parseInt(numbers[colIndex]);
+                }
+                rowIndex++;
+            }
+            if (rowIndex < matrix.length) {
+                System.out.println("Файл содержит меньше элементов, чем требуется для матрицы.");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static double calculateAverage(int[][] matrix) {
+        int sum = 0;
+        int count = 0;
+        for (int[] row : matrix) {
+            for (int value : row) {
+                sum += value;
+                count++;
+            }
+        }
+        return (double) sum / count;
+    }
+}
