@@ -1,0 +1,109 @@
+import java.io.*;
+import java.util.*;
+
+public class Main {
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+        // Запрос пути к файлу
+        System.out.print("Введите путь к файлу: ");
+        String filePath = scanner.nextLine();
+
+        // Запрос способа заполнения файла
+        System.out.println("Выберите способ заполнения файла:");
+        System.out.println("1. С клавиатуры");
+        System.out.println("2. Случайно (диапазон вводится с клавиатуры)");
+        int choice = scanner.nextInt();
+        
+        switch (choice) {
+            case 1:
+                fillFileFromKeyboard(filePath, scanner);
+                break;
+            case 2:
+                fillFileRandomly(filePath, scanner);
+                break;
+            default:
+                System.out.println("Неверный выбор");
+                return;
+        }
+
+        // Поиск двух самых больших чисел в файле
+        List<Integer> numbers = readNumbersFromFile(filePath);
+
+        int[] twoLargest = findTwoLargestNumbers(numbers);
+        System.out.println("Два самых больших числа: " + twoLargest[0] + " и " + twoLargest[1]);
+    }
+
+    private static void fillFileFromKeyboard(String filePath, Scanner scanner) {
+        System.out.println("Введите числа для записи в файл (вводите по одному числу на строку, для завершения введите 'exit'):");
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
+            while (true) {
+                String input = scanner.next();
+                if ("exit".equalsIgnoreCase(input)) {
+                    break;
+                }
+                try {
+                    int number = Integer.parseInt(input);
+                    writer.write(number + "\n");
+                } catch (NumberFormatException e) {
+                    // Пропускаем некорректные значения без уведомления
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void fillFileRandomly(String filePath, Scanner scanner) {
+        System.out.print("Введите минимальное значение диапазона: ");
+        int min = scanner.nextInt();
+        System.out.print("Введите максимальное значение диапазона: ");
+        int max = scanner.nextInt();
+        System.out.print("Введите количество случайных чисел для генерации: ");
+        int count = scanner.nextInt();
+
+        Random random = new Random();
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
+            for (int i = 0; i < count; i++) {
+                int number = random.nextInt((max - min) + 1) + min;
+                writer.write(number + "\n");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static List<Integer> readNumbersFromFile(String filePath) {
+        List<Integer> numbers = new ArrayList<>();
+        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                try {
+                    numbers.add(Integer.parseInt(line.trim()));
+                } catch (NumberFormatException e) {
+                    // Пропускаем некорректные значения без уведомления
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return numbers;
+    }
+
+    private static int[] findTwoLargestNumbers(List<Integer> numbers) {
+        int largest = Integer.MIN_VALUE;
+        int secondLargest = Integer.MIN_VALUE;
+        
+        for (int number : numbers) {
+            if (number > largest) {
+                secondLargest = largest;
+                largest = number;
+            } else if (number > secondLargest) {
+                secondLargest = number;
+            }
+        }
+        
+        return new int[] {largest, secondLargest};
+    }
+}
