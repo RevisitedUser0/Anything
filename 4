@@ -1,0 +1,63 @@
+import java.io.*;
+import java.util.Scanner;
+
+public class Вариант4 {
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+        // Запрос пути к файлу
+        System.out.print("Введите путь к файлу: ");
+        String fileName = scanner.nextLine();
+
+        // Перезаписать текст в файле новым текстом
+        System.out.println("Введите новый текст для перезаписи файла:");
+        String newText = scanner.nextLine();
+        writeFile(fileName, newText);
+
+        // Ввод значения K
+        System.out.print("Введите значение K для вывода каждого K-го символа: ");
+        int K = scanner.nextInt();
+        scanner.nextLine(); // очистка буфера
+
+        // Чтение и обработка текста из файла
+        String text = readFile(fileName);
+        if (text == null) {
+            System.out.println("Ошибка чтения файла.");
+            return;
+        }
+
+        // Вывести каждый K-тый символ
+        System.out.println("Каждый " + K + "-й символ:");
+        printEveryKthCharacter(text, K);
+    }
+
+    private static void writeFile(String fileName, String content) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName))) {
+            writer.write(content);
+        } catch (IOException e) {
+            System.err.println("Ошибка при записи в файл: " + e.getMessage());
+        }
+    }
+
+    private static String readFile(String fileName) {
+        StringBuilder content = new StringBuilder();
+        try (BufferedReader reader = new BufferedReader(new FileReader(fileName))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                content.append(line).append("\n");
+            }
+        } catch (IOException e) {
+            System.err.println("Ошибка при чтении файла: " + e.getMessage());
+            return null;
+        }
+        return content.toString();
+    }
+
+    private static void printEveryKthCharacter(String text, int K) {
+        for (int i = K - 1; i < text.length(); i += K) {
+            System.out.print(text.charAt(i) + " ");
+        }
+        System.out.println();
+    }
+}
