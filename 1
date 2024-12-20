@@ -1,0 +1,92 @@
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.Random;
+import java.util.Scanner;
+
+public class Вариант1 {
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.print("Введите размер массива: ");
+        int N = scanner.nextInt();
+
+        int[] array = new int[N];
+
+        System.out.println("Выберите способ заполнения массива:");
+        System.out.println("1. С клавиатуры");
+        System.out.println("2. Случайно (диапазон вводится с клавиатуры)");
+        System.out.println("3. Из файла");
+        int choice = scanner.nextInt();
+
+        switch (choice) {
+            case 1:
+                fillArrayFromKeyboard(array, scanner);
+                break;
+            case 2:
+                fillArrayRandomly(array, scanner);
+                break;
+            case 3:
+                System.out.print("Введите путь к файлу для массива: ");
+                String filePath = scanner.next();
+                fillArrayFromFile(array, filePath);
+                break;
+            default:
+                System.out.println("Неверный выбор");
+                return;
+        }
+
+        double average = calculateAverage(array);
+        System.out.println("Среднее арифметическое массива: " + average);
+    }
+
+    private static void fillArrayFromKeyboard(int[] array, Scanner scanner) {
+        System.out.println("Введите элементы массива:");
+        for (int i = 0; i < array.length; i++) {
+            array[i] = scanner.nextInt();
+        }
+    }
+
+    private static void fillArrayRandomly(int[] array, Scanner scanner) {
+        System.out.print("Введите минимальное значение диапазона: ");
+        int min = scanner.nextInt();
+        System.out.print("Введите максимальное значение диапазона: ");
+        int max = scanner.nextInt();
+
+        Random random = new Random();
+        for (int i = 0; i < array.length; i++) {
+            array[i] = random.nextInt((max - min) + 1) + min;
+        }
+    }
+
+    private static void fillArrayFromFile(int[] array, String fileName) {
+        try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
+            String line;
+            int index = 0;
+            while ((line = br.readLine()) != null && index < array.length) {
+                String[] numbers = line.split("\\s+");
+                for (String number : numbers) {
+                    if (index < array.length) {
+                        array[index++] = Integer.parseInt(number);
+                    } else {
+                        break;
+                    }
+                }
+            }
+            if (index < array.length) {
+                System.out.println("Файл содержит меньше элементов, чем требуется для массива.");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static double calculateAverage(int[] array) {
+        int sum = 0;
+        for (int value : array) {
+            sum += value;
+        }
+        return (double) sum / array.length;
+    }
+}
